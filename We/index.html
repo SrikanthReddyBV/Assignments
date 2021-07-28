@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+
+    <style>
+      #header {
+        display: flex;
+        flex-direction: row;
+        margin: 2%;
+        gap: 15px;
+        font-size: 25px;
+        font-family: Verdana, Geneva, Tahoma, sans-serif;
+      }
+
+      /* #header div {
+        border: black solid 2px;
+      } */
+      #movie_gallery {
+        display: grid;
+        grid-template-columns: repeat(4, 24%);
+        min-width: 150px;
+        min-height: 150px;
+        grid-gap: 10px;
+        margin: auto;
+        padding: 15px;
+      }
+      .movie_block {
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 8px 16px rgb(0 0 0 / 8%);
+        padding: 10px;
+      }
+
+      .movie_block > div > img {
+        height: 280px;
+        width: 280px;
+      }
+
+      #input {
+        height: 30px;
+        width: 700px;
+      }
+      #header > div > button {
+        height: 35px;
+        width: 100px;
+      }
+      #recommend {
+        background-color: rgb(177, 160, 10);
+        font-weight: bold;
+        font-size: large;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="header">
+      <div>
+        <a>IMDb</a>
+      </div>
+      <div>
+        <input type="text" id="input" />
+      </div>
+      <div>
+        <button onclick="getData()">Search</button>
+      </div>
+    </div>
+
+    <div id="movie_gallery"></div>
+  </body>
+</html>
+
+<script>
+  async function getData() {
+    let str = document.getElementById("input").value;
+    let res = await fetch(`http://www.omdbapi.com/?t=${str}&apikey=6593387c`);
+    let data = await res.json();
+
+    let isTrue = true;
+    if (data.Response == "False") {
+      isTrue = false;
+    }
+
+    if (isTrue) {
+      let title = data.Title;
+      let year = data.Year;
+      let rating = data.Ratings[0].Value.split("/");
+      let rtg = Number(rating[0]);
+      let type = data.Type;
+      let poster = data.Poster;
+
+      console.log(title, year, rtg, type, poster, rating);
+
+      let maindiv = document.getElementById("movie_gallery");
+      let mvblock = document.createElement("div");
+      mvblock.setAttribute("class", "movie_block");
+
+      let div1 = document.createElement("div");
+      let div2 = document.createElement("div");
+      let img = document.createElement("img");
+
+      img.src = poster;
+      div1.append(img);
+      if (rtg < 8.5) {
+        div2.innerHTML = `<h3>Title : ${title}</h3>  
+                        <p>Type : ${type}</p>
+                        <p>Year : ${year}</p>
+                        <p>Rating : ${rtg}</p>`;
+      } else {
+        div2.innerHTML = `<h3>Title : ${title}</h3>  
+                        <p>Type : ${type}</p>
+                        <p>Year : ${year}</p>
+                        <p>Rating : ${rtg}</p><a id="recommend">recommended</a>`;
+      }
+
+      mvblock.append(div1, div2);
+      maindiv.append(mvblock);
+    } else {
+      let maindiv = document.getElementById("movie_gallery");
+      let mvblock = document.createElement("div");
+      mvblock.setAttribute("class", "movie_block");
+
+      let div1 = document.createElement("div");
+      let div2 = document.createElement("div");
+      let img = document.createElement("img");
+
+      img.src = "https://www.sitesbay.com/files/404.gif";
+      div1.append(img);
+
+      div2.innerHTML = `<h3>Title : No data</h3>  
+                        <p>Type : No data</p>
+                        <p>Year : No data</p>
+                        <p></p>`;
+
+      mvblock.append(div1, div2);
+      maindiv.append(mvblock);
+    }
+  }
+
+  async function test() {
+    let res = await fetch("http://www.omdbapi.com/?t=batman&apikey=6593387c");
+    let data = await res.json();
+    console.log(data);
+  }
+
+  test();
+</script>
